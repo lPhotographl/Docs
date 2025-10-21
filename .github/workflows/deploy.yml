@@ -1,0 +1,40 @@
+name: Deploy Static Website to ECS # 工作流名称
+
+on:
+  push:
+    # 每次推送到 main 分支时触发自动化
+    branches:
+      - main
+  workflow_dispatch: # 允许手动点击运行
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        # 使用 appleboy/ssh-action 来处理 SSH 连接和 rsync 文件同步
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          # 从 GitHub Secrets 读取连接信息
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          # 核心部署命令
+          script: |
+            echo "--- Starting Deployment ---"
+            
+            # 1. 确保服务器有 rsync（虽然 Ubuntu 22.04 通常默认安装，但最好确保一下）
+            sudo apt update && sudo apt install rsync -y
+            
+            # 2. 使用 rsync 将新代码从 Actions 临时目录同步到 ECS 目录
+            # $GITHUB_WORKSPACE 是 Actions 自动存放代码的目录
+            # -avz: 归档模式, 详细输出, 压缩
+            # --delete: 删除目标目录中源目录没有的文件（保持文件完全一致）
+            rsync -avz --delete --exclude '.git' $GITHUB_WORKSPACE/ /var/www/docs/
+            
+            echo "Deployment finished successfully."
