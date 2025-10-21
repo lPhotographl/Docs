@@ -39,4 +39,8 @@ jobs:
             # 这样服务器 /var/www/docs/ 下就直接是 index.html 等文件了
             rsync -avz --delete $GITHUB_WORKSPACE/docs/ /var/www/html/
             
+            sudo chown -R www-data:www-data /var/www/html
+            sudo find /var/www/html -type d -exec chmod 755 {} \;
+            sudo find /var/www/html -type f -exec chmod 644 {} \;
+            
             echo "Deployment finished successfully."
