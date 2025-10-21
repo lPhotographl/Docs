@@ -35,8 +35,8 @@ jobs:
             # 1. 确保服务器有 rsync 
             sudo apt update && sudo apt install rsync -y
             
-            # 2. 使用 rsync 将新代码从 Actions 临时目录同步到 ECS 目录
-            # $GITHUB_WORKSPACE/ 是你仓库的根目录
-            rsync -avz --delete --exclude '.git' $GITHUB_WORKSPACE/ /var/www/docs/
+            # 2. ⚠️ 关键修改：只同步 $GITHUB_WORKSPACE/docs/ 目录下的内容
+        # 注意：最后要加 / 以同步目录内容而不是目录本身
+            rsync -avz --delete $GITHUB_WORKSPACE/docs/ /var/www/docs/
             
             echo "Deployment finished successfully."
