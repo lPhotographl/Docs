@@ -47,7 +47,7 @@ jobs:
             
             # 2. 关键修正 2: rsync 源路径改为构建后的目录！
             # 假设构建目录是 dist (如果是 public 或 _site 请自行修改)
-            rsync -avz --delete $GITHUB_WORKSPACE/dist/ /var/www/html/
+            rsync -avz --delete $GITHUB_WORKSPACE/docs/.vuepress/dist/ /var/www/html/
             
             # 3. 部署后权限和清理
             sudo chown -R www-data:www-data /var/www/html
