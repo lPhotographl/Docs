@@ -37,6 +37,6 @@ jobs:
             # 2. 关键修正：只同步项目仓库根目录下的 docs/ 文件夹内的内容
             # $GITHUB_WORKSPACE/docs/ 尾部的斜杠确保只同步内容，而不是 docs 文件夹本身
             # 这样服务器 /var/www/docs/ 下就直接是 index.html 等文件了
-            rsync -avz --delete $GITHUB_WORKSPACE/docs/ /var/www/docs/
+            rsync -avz --delete $GITHUB_WORKSPACE/docs/ /var/www/html/
             
             echo "Deployment finished successfully."
