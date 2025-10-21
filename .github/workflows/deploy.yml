@@ -1,4 +1,3 @@
-
 name: Deploy Static Website to ECS # 工作流名称
 
 on:
@@ -10,6 +9,7 @@ on:
 
 jobs:
   deploy:
+    # 确保运行环境正确
     runs-on: ubuntu-latest
 
     steps:
@@ -21,22 +21,22 @@ jobs:
         # 使用 appleboy/ssh-action 来处理 SSH 连接和 rsync 文件同步
         uses: appleboy/ssh-action@v1.0.3
 
-        # 关键部分：确保 'with:' 和上面的 'uses' 处于同级缩进
+        # ⚠️ 关键修正：with 块必须与 uses 块在同一层级，且其子项缩进必须正确
         with:
-          # 以下参数都必须在 'with:' 下，并使用相同的缩进（通常是四个空格）
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-          # 核心部署命令
+          # 核心部署命令：请注意 'script:' 后面的多行命令缩进
           script: |
             echo "--- Starting Deployment ---"
             
-            # 1. 确保服务器有 rsync 
+            # 1. 确保服务器有 rsync (仅在第一次运行时有必要)
             sudo apt update && sudo apt install rsync -y
             
-            # 2. ⚠️ 关键修改：只同步 $GITHUB_WORKSPACE/docs/ 目录下的内容
-        # 注意：最后要加 / 以同步目录内容而不是目录本身
+            # 2. 关键修正：只同步项目仓库根目录下的 docs/ 文件夹内的内容
+            # $GITHUB_WORKSPACE/docs/ 尾部的斜杠确保只同步内容，而不是 docs 文件夹本身
+            # 这样服务器 /var/www/docs/ 下就直接是 index.html 等文件了
             rsync -avz --delete $GITHUB_WORKSPACE/docs/ /var/www/docs/
             
             echo "Deployment finished successfully."
